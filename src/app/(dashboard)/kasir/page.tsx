@@ -8,7 +8,7 @@ export default function KasirPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [cart, setCart] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false); // State Modal Bayar
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     supabase.from("products").select("*").order("name").then(({data}) => setProducts(data || []));
@@ -34,12 +34,7 @@ export default function KasirPage() {
         await supabase.from('sale_items').insert({ sale_id: sale.id, product_id: item.id, product_name: item.name, quantity: item.qty, unit_price: item.sale_price, unit_cost: item.cost_price });
         await supabase.from('products').update({ stock: item.stock - item.qty }).eq('id', item.id);
       }
-      
-      // Notifikasi sukses
-      toast.success("Transaksi Berhasil!", {
-        description: `Total belanja: ${rupiah(total)}`,
-      });
-      
+      toast.success("Transaksi Berhasil!", { description: `Total: ${rupiah(total)}` });
       setCart([]);
       window.location.reload();
     } catch (err: any) {
@@ -50,28 +45,30 @@ export default function KasirPage() {
   };
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col lg:flex-row gap-6">
+      {/* Daftar Produk */}
       <div className="flex-1">
-        <h1 className="text-3xl font-bold text-green-900 mb-6">Kasir POS</h1>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-green-900 mb-6">Kasir POS</h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
           {products.map(p => (
-            <button key={p.id} onClick={() => addToCart(p)} className="bg-white p-4 rounded-xl shadow-sm border text-left hover:border-green-500 transition">
-              <h3 className="font-bold text-gray-800">{p.name}</h3>
-              <p className="text-green-700 font-bold mt-2">{rupiah(p.sale_price)}</p>
-              <p className="text-sm text-gray-500">Stok: {p.stock}</p>
+            <button key={p.id} onClick={() => addToCart(p)} className="bg-white p-3 md:p-4 rounded-xl shadow-sm border text-left hover:border-green-500 transition">
+              <h3 className="font-bold text-sm md:text-base text-gray-800 line-clamp-2">{p.name}</h3>
+              <p className="text-green-700 font-bold mt-1 md:mt-2 text-sm md:text-base">{rupiah(p.sale_price)}</p>
+              <p className="text-xs text-gray-500 mt-1">Stok: {p.stock}</p>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="w-80 bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-fit">
-        <h2 className="text-xl font-bold mb-4">Keranjang</h2>
+      {/* Keranjang */}
+      <div className="w-full lg:w-80 bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200 h-fit">
+        <h2 className="text-lg md:text-xl font-bold mb-4">Keranjang</h2>
         {cart.length === 0 ? <p className="text-gray-500 text-sm">Belum ada item</p> : (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
             {cart.map(item => (
               <div key={item.id} className="flex justify-between text-sm">
-                <span>{item.name} x {item.qty}</span>
-                <span className="font-semibold">{rupiah(item.sale_price * item.qty)}</span>
+                <span className="truncate pr-2">{item.name} x {item.qty}</span>
+                <span className="font-semibold whitespace-nowrap">{rupiah(item.sale_price * item.qty)}</span>
               </div>
             ))}
           </div>
@@ -87,10 +84,9 @@ export default function KasirPage() {
         </div>
       </div>
 
-      {/* MODAL KONFIRMASI PEMBAYARAN */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <h3 className="text-xl font-bold text-gray-800 mb-2">Konfirmasi Pembayaran</h3>
             <p className="text-gray-600 mb-4">Apakah Anda yakin ingin memproses transaksi ini?</p>
             <div className="bg-gray-50 p-4 rounded-lg mb-6">
@@ -100,8 +96,8 @@ export default function KasirPage() {
               </div>
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">Batal</button>
-              <button onClick={handleCheckout} className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 rounded-lg font-medium">Ya, Bayar</button>
+              <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg">Batal</button>
+              <button onClick={handleCheckout} className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 rounded-lg">Ya, Bayar</button>
             </div>
           </div>
         </div>
