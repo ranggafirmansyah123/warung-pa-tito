@@ -20,6 +20,21 @@ export default function KasirPage() {
     else setCart([...cart, { ...p, qty: 1 }]);
   };
 
+  // Fungsi untuk mengurangi jumlah (tidak bisa kurang dari 1)
+  const decreaseQty = (id: string) => {
+    setCart(cart.map((item) => {
+      if (item.id === id && item.qty > 1) {
+        return { ...item, qty: item.qty - 1 };
+      }
+      return item;
+    }));
+  };
+
+  // Fungsi untuk menghapus barang dari keranjang sepenuhnya
+  const removeFromCart = (id: string) => {
+    setCart(cart.filter((item) => item.id !== id));
+  };
+
   const total = cart.reduce((sum, item) => sum + (item.sale_price * item.qty), 0);
 
   const handleCheckout = async () => {
@@ -46,10 +61,9 @@ export default function KasirPage() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      {/* Daftar Produk */}
       <div className="flex-1">
         <h1 className="text-2xl md:text-3xl font-bold text-green-900 mb-6">Kasir POS</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
           {products.map(p => (
             <button key={p.id} onClick={() => addToCart(p)} className="bg-white p-3 md:p-4 rounded-xl shadow-sm border text-left hover:border-green-500 transition">
               <h3 className="font-bold text-sm md:text-base text-gray-800 line-clamp-2">{p.name}</h3>
@@ -60,15 +74,24 @@ export default function KasirPage() {
         </div>
       </div>
 
-      {/* Keranjang */}
       <div className="w-full lg:w-80 bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200 h-fit">
         <h2 className="text-lg md:text-xl font-bold mb-4">Keranjang</h2>
         {cart.length === 0 ? <p className="text-gray-500 text-sm">Belum ada item</p> : (
-          <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+          <div className="space-y-3 mb-4 max-h-64 overflow-y-auto pr-2">
             {cart.map(item => (
-              <div key={item.id} className="flex justify-between text-sm">
-                <span className="truncate pr-2">{item.name} x {item.qty}</span>
-                <span className="font-semibold whitespace-nowrap">{rupiah(item.sale_price * item.qty)}</span>
+              <div key={item.id} className="flex justify-between items-center text-sm border-b pb-2">
+                <div className="flex-1 truncate pr-2">
+                  <div className="font-medium text-gray-800 truncate">{item.name}</div>
+                  <div className="text-gray-500 text-xs">{rupiah(item.sale_price)}</div>
+                </div>
+                
+                {/* Tombol Kontrol Jumlah */}
+                <div className="flex items-center gap-2">
+                  <button onClick={() => decreaseQty(item.id)} className="bg-gray-100 hover:bg-gray-200 text-gray-700 w-7 h-7 flex items-center justify-center rounded font-bold">-</button>
+                  <span className="w-6 text-center font-semibold">{item.qty}</span>
+                  <button onClick={() => addToCart(item)} className="bg-gray-100 hover:bg-gray-200 text-gray-700 w-7 h-7 flex items-center justify-center rounded font-bold">+</button>
+                  <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700 ml-1 text-xs">X</button>
+                </div>
               </div>
             ))}
           </div>
