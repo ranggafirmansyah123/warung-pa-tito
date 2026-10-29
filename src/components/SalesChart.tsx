@@ -54,7 +54,7 @@ export default function SalesChart() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
               <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#6b7280" }} tickFormatter={(val) => new Date(val).toLocaleDateString("id-ID", { day: "numeric", month: "short" })} />
               <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} tickFormatter={(val) => `${val / 1000}rb`} />
-              <Tooltip formatter={(value: any) => [rupiah(Number(value)), "Omzet"]} labelFormatter={(label) => new Date(label).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }} />
+              <Tooltip formatter={(value: any) => [rupiah(Number(value)), "Omzet"]} labelFormatter={(label: any) => new Date(label).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }} />
               <Line type="monotone" dataKey="omzet" stroke="#065f46" strokeWidth={3} dot={{ r: 4, fill: "#065f46" }} activeDot={{ r: 8 }} />
             </LineChart>
           </ResponsiveContainer>
